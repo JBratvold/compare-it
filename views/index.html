@@ -6,6 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>My Website</title>
     <link rel="stylesheet" href="./style.css">
+    <script>
+        // Display alert message if `message` query parameter exists
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            if (message) {
+                alert(message);
+            }
+        };
+    </script>
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <style>
         body {

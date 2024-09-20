@@ -42,7 +42,7 @@
     }
 
     button {
-      background-color: #6c757d; /* Gray tone for default buttons */
+      background-color: #007bff; /* Gray tone for default buttons */
       color: white;
       padding: 10px 15px;
       border: none;
@@ -52,7 +52,7 @@
     }
 
     button:hover {
-      background-color: #5a6268; /* Darker gray on hover */
+      background-color: #28a745; /* Darker gray on hover */
     }
 
     .back-next-button {
@@ -234,7 +234,8 @@
 
       const previewContainer = document.getElementById('preview-container');
       previewContainer.innerHTML = `
-        <h3>Does this look correct?</h3>
+        <h2>Comparison Preview</h2>
+        <p>If the information is incorrect, please go back and make the necessary changes, as no further edits can be made after submission.</p>
         <div class="preview">
           <strong>Category:</strong> ${category}<br>
           <strong>Prompt:</strong> ${prompt}<br>
@@ -258,12 +259,13 @@
         </div>
         <div class="progress-text">1/5</div> <!-- Initialize with the first step -->
 
-        <form action="/x" method="POST">
+        <form action="/submitted" method="POST">
             <!-- Step 1: Category -->
             <div class="step">
                 <label for="category"><h2>Category</h2></label>
-                <p>Please enter a unique category that best describes the items you are comparing.</p>
-                <p class="prompt">Example: "Food", "Names", "Countries"</p>
+                <p>Please enter a short category title or name for this comparison. 
+                  (It should describe what items will be in this comparison)</p>
+                <p class="prompt">Example: "Places to visit 2025" </p>
                 <input type="text" id="category" name="category" placeholder="Enter category" required>
                 <button type="button" class="back-next-button" onclick="location.href='/'">Back</button>
                 <button type="button" class="back-next-button" onclick="nextStep()">Next</button>
@@ -271,8 +273,9 @@
             
             <!-- Step 2: Prompt -->
             <div class="step">
+                <label for="prompt"><h2>Prompt</h2></label>
                 <p>Please enter a prompt to describe what you are trying to compare.</p>
-                <p class="prompt">Example: "Which food is the most delicious?"</p>
+                <p class="prompt">Example: "Which place would you rather visit?"</p>
                 <label for="prompt">Prompt</label>
                 <input type="text" id="prompt" name="prompt" placeholder="Enter prompt" required>
                 <button type="button" class="back-next-button" onclick="previousStep()">Back</button>
@@ -281,13 +284,20 @@
             
             <!-- Step 3: Items -->
             <div class="step">
-                <p>Please add each item you would like to compare.</p>
-                <p class="prompt">Example: "Pizza", "Hamburgers", "Poptarts"</p>
+                <label for="item"><h2>Items</h2></label>
+                <p>Please individually add each item you would like to compare.</p>
+                <p class="prompt">Example Item: "Germany"</p>
+                <p class="prompt">Example Item: "Australia"</p>
                 <div id="items-container">
                     <div class="item-container">
                         <label for="item">Item:</label>
                         <input type="text" id="item" name="items[]" placeholder="Enter item" required>
                         <button type="button" class="remove-button" onclick="this.parentElement.remove()">Remove</button>
+                    </div>
+                    <div class="item-container">
+                      <label for="item">Item:</label>
+                      <input type="text" id="item" name="items[]" placeholder="Enter item" required>
+                      <button type="button" class="remove-button" onclick="this.parentElement.remove()">Remove</button>
                     </div>
                 </div>
                 <button type="button" onclick="addField()">+ Add Item</button>

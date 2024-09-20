@@ -24,7 +24,11 @@ router.get('/categories', dbController.getAllTables);
 router.get('/categories/:tableName', dbController.getTableData);
 
 // POST Routes
-router.post('/x', formController.submitForm);
+router.post('/submitted', formController.submitForm);
+
+// router.get('/submitted', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../views/index.html'));
+// });
 
 // Catch-all 404 route
 router.use((req, res) => {

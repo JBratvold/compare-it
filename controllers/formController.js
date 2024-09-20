@@ -66,7 +66,11 @@ const generateCreateTableQuery = (category, items) => {
         throw new Error('Error inserting data.');
       }
       
-      res.send('Table created and data inserted successfully!');
+      // res.send('Table created and data inserted successfully!');
+      // Redirect to index with a success message
+      res.redirect('/?message=Category created successfully!');
+    
+      
     } catch (err) {
       console.error('Error:', err);
       res.status(500).send('An error occurred.');
