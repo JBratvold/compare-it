@@ -52,6 +52,7 @@ To run the application locally, you need to have the following installed:
    DB_URL=<your-turso-database-url>
    DB_AUTH_TOKEN=<your-turso-database-token>
    PORT=3000
+   PASSWORD=<whatever-password-you-want-for-app>
 ```
 
 ### Running the Application
