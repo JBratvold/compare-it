@@ -48,7 +48,8 @@ To run the application locally, you need to have the following installed:
 
 1. Create a ```.env``` file in the project root with the following variables:
 
-```DB_URL=<your-turso-database-url>
+```
+   DB_URL=<your-turso-database-url>
    PORT=3000
 ```
 
