@@ -1,4 +1,4 @@
-# Name-Ranker Web Application
+# Compare-It Web Application
 
 This web application allows users to compare multiple items in a pairwise fashion and helps determine which item is preferred. The application dynamically handles comparisons across different user-created categories.
 
