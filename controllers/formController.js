@@ -34,48 +34,83 @@ const generateCreateTableQuery = (category, items) => {
   };
   
   // Main form submission handler
-  exports.submitForm = async (req, res) => {
-    try {
+ // Main form submission handler
+exports.submitForm = async (req, res) => {
+  try {
       const { category, prompt, creator, items = [] } = req.body;
-  
+
+      // Check if items is empty and set to default
+      const finalItems = items.length > 0 ? items : ['NoItems'];
+
       const db_url = process.env.DB_URL;
       const db_auth_token = process.env.DB_AUTH_TOKEN;
-  
+
       // Generate the CREATE TABLE query
-      const createTableQuery = generateCreateTableQuery(category, items);
-  
+      const createTableQuery = generateCreateTableQuery(category, finalItems);
+
       // Execute the CREATE TABLE query
       const createTableResponse = await executeSQLQuery(db_url, db_auth_token, createTableQuery);
-  
+
       // Check for errors in the table creation response
       if (createTableResponse.results && createTableResponse.results.some(result => result.type === 'error')) {
-        throw new Error('Error creating table.');
+          throw new Error('Error creating table.');
       }
-  
+
       // Generate the INSERT query
-      const insertDataQuery = generateInsertQuery(prompt, creator, category, items);
-  
+      const insertDataQuery = generateInsertQuery(prompt, creator, category, finalItems);
+
       // Prepare params for insertion
-      const params = [prompt, creator, ...items.map(() => 0)];
-  
+      const params = [prompt, creator, ...finalItems.map(() => 0)];
+
       // Execute the INSERT query
       const insertDataResponse = await executeSQLQuery(db_url, db_auth_token, insertDataQuery, params);
-  
+
       // Check for errors in the insertion response
       if (insertDataResponse.results && insertDataResponse.results.some(result => result.type === 'error')) {
-        throw new Error('Error inserting data.');
+          throw new Error('Error inserting data.');
       }
-      
-      // res.send('Table created and data inserted successfully!');
+
       // Redirect to index with a success message
       res.redirect('/?message=Category created successfully!');
-    
-      
-    } catch (err) {
+
+  } catch (err) {
       console.error('Error:', err);
       res.status(500).send('An error occurred.');
+  }
+};
+
+
+  exports.deleteCategory = async (req, res) => {
+    const category = req.params.category;
+    const password = req.body.password; // Get the password from the request body
+    const db_url = process.env.DB_URL;
+    const db_auth_token = process.env.DB_AUTH_TOKEN;
+
+    // Check if the password is correct
+    if (password !== process.env.PASSWORD) {
+        return res.status(403).send('Incorrect password.');
     }
-  };
+
+    // Generate the DROP TABLE query
+    const dropTableQuery = `DROP TABLE IF EXISTS "${category}";`;
+
+    try {
+        const deleteResponse = await executeSQLQuery(db_url, db_auth_token, dropTableQuery);
+
+        // Check for errors in the deletion response
+        if (deleteResponse.results && deleteResponse.results.some(result => result.type === 'error')) {
+            throw new Error('Error deleting table.');
+        }
+
+        // Redirect to categories page with a success message
+        res.redirect('/categories?message=Category deleted successfully.');
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('An error occurred while deleting the category.');
+    }
+};
+
+
   
   // Export the executeSQLQuery function
   module.exports.executeSQLQuery = executeSQLQuery;

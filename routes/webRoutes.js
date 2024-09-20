@@ -26,9 +26,9 @@ router.get('/categories/:tableName', dbController.getTableData);
 // POST Routes
 router.post('/submitted', formController.submitForm);
 
-// router.get('/submitted', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../views/index.html'));
-// });
+// Add this delete route
+router.post('/delete/:category', formController.deleteCategory);
+
 
 // Catch-all 404 route
 router.use((req, res) => {
