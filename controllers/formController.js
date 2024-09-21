@@ -34,7 +34,6 @@ const generateCreateTableQuery = (category, items) => {
   };
   
   // Main form submission handler
- // Main form submission handler
 exports.submitForm = async (req, res) => {
   try {
       const { category, prompt, creator, items = [] } = req.body;
@@ -127,9 +126,6 @@ exports.resetCategory = async (req, res) => {
       // Get the list of columns for the table
       const getColumnsQuery = `PRAGMA table_info("${category}");`;
       const columnsResponse = await executeSQLQuery(db_url, db_auth_token, getColumnsQuery);
-
-      // Log the columns response for debugging
-      console.log('Columns Response:', JSON.stringify(columnsResponse, null, 2));
 
       // Access the rows array from the response
       const columns = columnsResponse.results[0].response.result.rows;

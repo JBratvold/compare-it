@@ -11,13 +11,9 @@ exports.getAllTables = async (req, res) => {
     
     const response = await executeSQLQuery(db_url, db_auth_token, sql);
     
-    // Log the nested response to understand its structure
-    console.log('Nested Response from executeSQLQuery:', response.results[0].response);
-
     // Accessing the table names correctly
     const tables = response.results[0].response.result.rows.map(row => row[0]); // Get the first item from each row
-    console.log('Tables found:', tables); // Log the tables found
-
+    
     res.render('categories', { tables });
   } catch (err) {
     console.error('Error fetching tables:', err);
@@ -66,5 +62,31 @@ exports.getTableData = async (req, res) => {
     } catch (err) {
         console.error('Error fetching table data:', err);
         res.status(500).send('An error occurred while fetching table data.');
+    }
+};
+
+
+// In dbController.js
+
+// Function to check if a table exists
+exports.checkTableExists = async (req, res) => {
+    const category = req.query.category;
+    const db_url = process.env.DB_URL;
+    const db_auth_token = process.env.DB_AUTH_TOKEN;
+
+    // Query to check if the table exists
+    const checkQuery = `
+        SELECT name FROM sqlite_master WHERE type='table' AND name='${category}';
+    `;
+
+    try {
+        const response = await executeSQLQuery(db_url, db_auth_token, checkQuery);
+        const tableExists = response.results[0].response.result.rows.length > 0;
+
+        // Send back a JSON response indicating if the table exists
+        res.json(tableExists);
+    } catch (err) {
+        console.error('Error checking table existence:', err);
+        res.status(500).send('An error occurred while checking table existence.');
     }
 };

@@ -32,6 +32,9 @@ router.post('/delete/:category', formController.deleteCategory);
 // Add this reset route
 router.post('/reset/:category', formController.resetCategory);
 
+// Add this route to check if the table exists
+router.get('/check-table-exists', dbController.checkTableExists);
+
 
 // Catch-all 404 route
 router.use((req, res) => {
