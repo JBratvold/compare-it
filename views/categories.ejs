@@ -89,17 +89,71 @@
             cursor: pointer;
             font-size: 16px; /* Icon size */
         }
+
         .delete-button:hover {
-            background-color: #ece5e5; /* Darker yellow on hover */
+            background-color: #ece5e5; /* Darker red on hover */
+        }
+
+        .password-input {
+            display: none; /* Initially hidden */
+            margin-right: 10px;
+            width: 50px;
         }
     </style>
     <script>
-        function confirmDelete(tableName) {
-            const password = prompt("Enter password to delete the category:");
-            if (password === "password") {
-                location.href = `/delete/${tableName}`;
+        function toggleDeleteForm(button) {
+            const passwordInput = button.parentElement.querySelector('.password-input'); // Find the password input inside the same div
+    
+            // Toggle visibility
+            if (passwordInput.style.display === 'none' || passwordInput.style.display === '') {
+                passwordInput.style.display = 'inline'; // Show password input
+                passwordInput.focus(); // Focus on the password input
             } else {
-                alert("Incorrect password. Deletion cancelled.");
+                // If the input is visible, check if there's a value
+                if (passwordInput.value) {
+                    // Submit the form if there's a password
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/delete/${button.parentElement.previousElementSibling.innerText}`;
+                    const passwordField = document.createElement('input');
+                    passwordField.type = 'hidden';
+                    passwordField.name = 'password';
+                    passwordField.value = passwordInput.value;
+                    form.appendChild(passwordField);
+                    document.body.appendChild(form);
+                    form.submit(); // Submit the form
+                } else {
+                    // Hide input if no password was provided
+                    passwordInput.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleResetForm(button) {
+            const passwordInput = button.parentElement.querySelector('.password-input'); // Find the password input inside the same div
+
+            // Toggle visibility
+            if (passwordInput.style.display === 'none' || passwordInput.style.display === '') {
+                passwordInput.style.display = 'inline'; // Show password input
+                passwordInput.focus(); // Focus on the password input
+            } else {
+                // If the input is visible, check if there's a value
+                if (passwordInput.value) {
+                    // Submit the form for reset if there's a password
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/reset/${button.parentElement.previousElementSibling.innerText}`;
+                    const passwordField = document.createElement('input');
+                    passwordField.type = 'hidden';
+                    passwordField.name = 'password';
+                    passwordField.value = passwordInput.value;
+                    form.appendChild(passwordField);
+                    document.body.appendChild(form);
+                    form.submit(); // Submit the form
+                } else {
+                    // Hide input if no password was provided
+                    passwordInput.style.display = 'none';
+                }
             }
         }
     </script>
@@ -113,52 +167,18 @@
                 <li>
                     <a href="/categories/<%= table.value %>"><%= table.value %></a>
                     <div style="display: flex; align-items: center;">
-                        <input type="password" name="password" placeholder="Pass" maxlength="4" required style="display: none; margin-right: 10px; width: 50px;" class="password-input">
+                        <input type="password" name="password" placeholder="Pin" maxlength="4" required style="display: none; margin-right: 10px; width: 50px;" class="password-input">
                         <button class="delete-button" onclick="toggleDeleteForm(this)">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                        <button class="reset-button" onclick="location.href='/reset/<%= table.value %>'">Reset</button>
+                        <button class="reset-button" onclick="toggleResetForm(this)">Reset</button>
                         <button class="play-button" onclick="location.href='/categories/<%= table.value %>'">Play</button>
                     </div>
                 </li>
             <% } %>
         <% }); %>
     </ul>
-    
-    <script>
-    function toggleDeleteForm(button) {
-        const input = button.previousElementSibling; // Get the password input
-    
-        // Toggle visibility
-        if (input.style.display === 'none' || input.style.display === '') {
-            input.style.display = 'inline'; // Show password input
-            input.focus(); // Focus on the password input
-        } else {
-            // If the input is visible, check if there's a value
-            if (input.value) {
-                // Submit the form if there's a password
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/delete/${button.parentElement.previousElementSibling.innerText}`;
-                const passwordField = document.createElement('input');
-                passwordField.type = 'hidden';
-                passwordField.name = 'password';
-                passwordField.value = input.value;
-                form.appendChild(passwordField);
-                document.body.appendChild(form);
-                form.submit(); // Submit the form
-            } else {
-                // Hide input if no password was provided
-                input.style.display = 'none';
-            }
-        }
-    }
-    </script>
-    
-    
-    
-    
-    
+
     <button type="button" class="back-next-button" onclick="location.href='/'">Back</button>
 </body>
 </html>

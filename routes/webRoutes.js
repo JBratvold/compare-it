@@ -29,6 +29,9 @@ router.post('/submitted', formController.submitForm);
 // Add this delete route
 router.post('/delete/:category', formController.deleteCategory);
 
+// Add this reset route
+router.post('/reset/:category', formController.resetCategory);
+
 
 // Catch-all 404 route
 router.use((req, res) => {
