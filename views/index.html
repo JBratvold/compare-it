@@ -17,6 +17,7 @@
         };
     </script>
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap"> <!-- Fancy Font -->
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -44,13 +45,28 @@
             width: 300px;
         }
 
+        /* Bounce animation */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0); /* Start and end at original position */
+            }
+            50% {
+                transform: translateY(-10px); /* Move up 10px at the middle of the animation */
+            }
+        }
+
         h1 {
             color: #333;
-            margin-bottom: 20px;
+            font-family: 'Playfair Display', serif; /* Apply Fancy Font */
+            font-size: 52px;
+            margin-top: 5px;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Add text shadow */
+            animation: bounce 5s infinite; /* Apply bounce animation */
         }
 
         a.button {
-            display: inline-block;
+            display: block; /* Make buttons block elements to stack them */
             background: #007bff;
             color: white;
             padding: 10px 20px;
@@ -67,6 +83,44 @@
         p {
             color: #666;
             margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px; /* Max width of the modal */
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -74,17 +128,55 @@
 
     <main>
         <div>
-            <h1>Compare-It!</h1>
-            <p class="description"></p>
-                Compare-It allows you to compare multiple items across various categories and helps you determine the most preferred item. Create custom categories, input your items, and let Compare-It assist you in making data-driven decisions!
+            <h1><b>Compare-It</b></h1>
+            <p class="description">
+                - Which is better -
             </p>
-            <a class="button" href="categories">Compare-It!</a>
+            <a class="button" href="categories">Compare</a>
             <a class="button" href="form">Create New Category</a>
+            <br><br>
+            <p><a href="#" id="aboutBtn">About</a></p>
             <p>DB powered by: <a href="https://turso.tech/">Turso</a></p>
             <p>Server hosted by: <a href="https://render.com/">Render</a></p>
             <p>App created by: <a href="https://jbratvold.github.io/">Josh</a></p>
         </div>
     </main>
-    <script src="index.js"></script>
+
+    <!-- The Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>About Compare-It</h2>
+            <p>Compare-It allows you to compare multiple items across various categories and helps you determine the most preferred item. Create custom categories, input your items, and let Compare-It assist you in making data-driven decisions!</p>
+        </div>
+    </div>
+
+    <script>
+        // Get modal element
+        const modal = document.getElementById("aboutModal");
+
+        // Get button that opens the modal
+        const btn = document.getElementById("aboutBtn");
+
+        // Get the <span> element that closes the modal
+        const span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        };
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        };
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+    </script>
 </body>
 </html>
