@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compare-It</title>
+    <title>Compare-It - Data for <%= tableName %></title>
     <link rel="stylesheet" href="/styles.css">
     <style>
         body {
@@ -12,9 +12,14 @@
             margin: 0;
             padding: 20px;
         }
+
+        h1, h2 {
+            color: #333;
+        }
+
         .data-table {
-            margin: 20px;
-            background: white;
+            margin: 20px 0;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
@@ -22,39 +27,60 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
+
         .row {
             border-bottom: 1px solid #ddd;
             padding: 10px 0;
-            display: contents; /* Ensure rows work well with grid */
+            display: contents;
         }
+
         .column {
-            color: #333;
-            padding: 5px;
-            background: #f9f9f9;
+            padding: 10px;
+            background-color: #f9f9f9;
             border-radius: 4px;
             margin: 5px 0;
-        }
-        .column strong {
-            color: #007bff; /* Bootstrap primary color */
-        }
-        h1, h2 {
             color: #333;
         }
-        hr {
-            border: 0;
-            border-top: 1px solid #ddd;
+
+        .column strong {
+            color: #007bff;
         }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 15px 0;
+        }
+
+        .no-data {
+            font-size: 16px;
+            color: #777;
+            padding: 20px;
+            text-align: center;
+        }
+
         a {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 15px;
-            background: #007bff;
+            background-color: #007bff;
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            transition: background-color 0.3s;
         }
+
         a:hover {
-            background: #0056b3;
+            background-color: #0056b3;
+        }
+
+        /* Responsive canvas */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Adjust height for larger screens */
+            max-height: 400px; /* Limit max height */
+            margin: 20px 0;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -66,7 +92,7 @@
         <% if (data.length > 0) { %>
             <% data.forEach(row => { %>
                 <div class="row">
-                    <% Object.keys(row).forEach((colName, index) => { %>
+                    <% Object.keys(row).forEach(colName => { %>
                         <% if (colName !== 'id') { %> <!-- Skip the 'id' column -->
                             <div class="column">
                                 <strong><%= colName %>:</strong> <%= row[colName] %>
@@ -74,22 +100,29 @@
                         <% } %>
                     <% }); %>
                 </div>
-                <hr>
             <% }); %>
         <% } else { %>
-            <p>No data available for this table.</p>
+            <p class="no-data">No data available for this table.</p>
         <% } %>
     </div>
 
     <h2>Frequency Chart</h2>
-    <canvas id="frequencyChart" width="400" height="200"></canvas>
+    <div class="chart-container">
+        <canvas id="frequencyChart"></canvas>
+    </div>
+
+    <h2>Pie Chart</h2>
+    <div class="chart-container">
+        <canvas id="doughnutChart"></canvas>
+    </div>
     
     <script>
         const labels = <%- JSON.stringify(Object.keys(frequencyData)) %>;
         const dataValues = <%- JSON.stringify(Object.values(frequencyData)) %>;
 
-        const ctx = document.getElementById('frequencyChart').getContext('2d');
-        const frequencyChart = new Chart(ctx, {
+        // Bar Chart
+        const ctxBar = document.getElementById('frequencyChart').getContext('2d');
+        const frequencyChart = new Chart(ctxBar, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -101,17 +134,17 @@
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
                     hoverBorderColor: 'rgba(75, 192, 192, 1)',
-                    barThickness: 30,
+                    barThickness: 'flex'
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true,
                         grid: {
                             color: '#e0e0e0',
-                            lineWidth: 1,
                         },
                         ticks: {
                             color: '#333',
@@ -127,8 +160,10 @@
                         ticks: {
                             color: '#333',
                             font: {
-                                size: 14,
-                            }
+                                size: 11,
+                            },
+                            maxRotation: 45,
+                            minRotation: 30,
                         }
                     }
                 },
@@ -141,6 +176,71 @@
                 }
             }
         });
+
+        // Pie Chart
+        const combinedData = labels.map((label, index) => ({
+            label: label,
+            value: dataValues[index]
+        }));
+
+        combinedData.sort((a, b) => b.value - a.value);
+        const sortedLabels = combinedData.map(data => data.label);
+        const sortedValues = combinedData.map(data => data.value);
+
+        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+        const backgroundColors = [
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+            'rgba(255, 205, 86, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(231, 76, 60, 0.7)',
+            'rgba(46, 204, 113, 0.7)',
+            'rgba(52, 152, 219, 0.7)',
+            'rgba(241, 196, 15, 0.7)',
+            'rgba(155, 89, 182, 0.7)',
+            'rgba(22, 160, 133, 0.7)',
+            'rgba(41, 128, 185, 0.7)',
+            'rgba(243, 156, 18, 0.7)',
+            'rgba(52, 73, 94, 0.7)',
+            'rgba(142, 68, 173, 0.7)',
+            'rgba(26, 188, 156, 0.7)',
+            'rgba(149, 165, 166, 0.7)',
+            'rgba(243, 156, 18, 0.7)',
+            'rgba(192, 57, 43, 0.7)'
+        ];
+
+        const pieColors = sortedValues.map((_, index) => backgroundColors[index % backgroundColors.length]);
+
+        const pieChart = new Chart(ctxDoughnut, {
+            type: 'pie', // Changed to 'pie'
+            data: {
+                labels: sortedLabels,
+                datasets: [{
+                    label: 'Frequency',
+                    data: sortedValues,
+                    backgroundColor: pieColors,
+                    borderColor: pieColors.map(color => color.replace('0.7', '1')),
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        bottom: 20
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+
     </script>
 
     <a href="/categories">Back to Categories</a>
