@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compare-It</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome -->
+    <title>Compare-It - Categories</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,7 +44,7 @@
             text-decoration: none;
             color: #007bff;
             font-weight: bold;
-            flex-grow: 1; /* Allow the name to take available space */
+            flex-grow: 1;
         }
 
         a:hover {
@@ -53,113 +52,56 @@
         }
 
         button {
-            background-color: #007bff; /* Gray tone for default buttons */
+            background-color: #007bff;
             color: white;
             padding: 10px 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-left: 10px; /* Space between buttons */
+            margin-left: 10px;
         }
 
         button:hover {
-            background-color: #0069d9; /* Darker gray on hover */
+            background-color: #0069d9;
         }
 
         .play-button {
-            background-color: #28a745; /* Green for play button */
+            background-color: #28a745;
         }
 
         .play-button:hover {
-            background-color: #218838; /* Darker green on hover */
+            background-color: #218838;
         }
 
         .reset-button {
-            background-color: #ffc107; /* Yellow for reset button */
+            background-color: #ffc107;
         }
 
         .reset-button:hover {
-            background-color: #e0a800; /* Darker yellow on hover */
+            background-color: #e0a800;
         }
 
         .delete-button {
-            background: none; /* No background */
-            border: none; /* No border */
-            color: #dc3545; /* Red color for delete */
+            background: none;
+            border: none;
+            color: #dc3545;
             cursor: pointer;
-            font-size: 16px; /* Icon size */
+            font-size: 16px;
         }
 
         .delete-button:hover {
-            background-color: #ece5e5; /* Darker red on hover */
+            background-color: #ece5e5;
         }
 
         .password-input {
-            display: none; /* Initially hidden */
+            display: none;
             margin-right: 10px;
             width: 50px;
         }
     </style>
-    <script>
-        function toggleDeleteForm(button) {
-            const passwordInput = button.parentElement.querySelector('.password-input'); // Find the password input inside the same div
-    
-            // Toggle visibility
-            if (passwordInput.style.display === 'none' || passwordInput.style.display === '') {
-                passwordInput.style.display = 'inline'; // Show password input
-                passwordInput.focus(); // Focus on the password input
-            } else {
-                // If the input is visible, check if there's a value
-                if (passwordInput.value) {
-                    // Submit the form if there's a password
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/delete/${button.parentElement.previousElementSibling.innerText}`;
-                    const passwordField = document.createElement('input');
-                    passwordField.type = 'hidden';
-                    passwordField.name = 'password';
-                    passwordField.value = passwordInput.value;
-                    form.appendChild(passwordField);
-                    document.body.appendChild(form);
-                    form.submit(); // Submit the form
-                } else {
-                    // Hide input if no password was provided
-                    passwordInput.style.display = 'none';
-                }
-            }
-        }
-
-        function toggleResetForm(button) {
-            const passwordInput = button.parentElement.querySelector('.password-input'); // Find the password input inside the same div
-
-            // Toggle visibility
-            if (passwordInput.style.display === 'none' || passwordInput.style.display === '') {
-                passwordInput.style.display = 'inline'; // Show password input
-                passwordInput.focus(); // Focus on the password input
-            } else {
-                // If the input is visible, check if there's a value
-                if (passwordInput.value) {
-                    // Submit the form for reset if there's a password
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/reset/${button.parentElement.previousElementSibling.innerText}`;
-                    const passwordField = document.createElement('input');
-                    passwordField.type = 'hidden';
-                    passwordField.name = 'password';
-                    passwordField.value = passwordInput.value;
-                    form.appendChild(passwordField);
-                    document.body.appendChild(form);
-                    form.submit(); // Submit the form
-                } else {
-                    // Hide input if no password was provided
-                    passwordInput.style.display = 'none';
-                }
-            }
-        }
-    </script>
 </head>
 <body>
-    <h1>Pairwise Comparison Categories</h1>
+    <h1>Categories</h1>
 
     <ul>
         <% tables.forEach(function(table) { %>
@@ -167,7 +109,7 @@
                 <li>
                     <a href="/categories/<%= table.value %>"><%= table.value %></a>
                     <div style="display: flex; align-items: center;">
-                        <input type="password" name="password" placeholder="Pin" maxlength="4" required style="display: none; margin-right: 10px; width: 50px;" class="password-input">
+                        <input type="password" name="password" placeholder="Pin" maxlength="4" required class="password-input">
                         <button class="delete-button" onclick="toggleDeleteForm(this)">
                             <i class="fas fa-trash-alt"></i>
                         </button>
@@ -180,5 +122,53 @@
     </ul>
 
     <button type="button" class="back-next-button" onclick="location.href='/'">Back</button>
+
+    <script>
+        function toggleDeleteForm(button) {
+            const passwordInput = button.parentElement.querySelector('.password-input');
+            if (passwordInput.style.display === 'none' || passwordInput.style.display === '') {
+                passwordInput.style.display = 'inline';
+                passwordInput.focus();
+            } else {
+                if (passwordInput.value) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/delete/${button.parentElement.previousElementSibling.innerText}`;
+                    const passwordField = document.createElement('input');
+                    passwordField.type = 'hidden';
+                    passwordField.name = 'password';
+                    passwordField.value = passwordInput.value;
+                    form.appendChild(passwordField);
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    passwordInput.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleResetForm(button) {
+            const passwordInput = button.parentElement.querySelector('.password-input');
+            if (passwordInput.style.display === 'none' || passwordInput.style.display === '') {
+                passwordInput.style.display = 'inline';
+                passwordInput.focus();
+            } else {
+                if (passwordInput.value) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/reset/${button.parentElement.previousElementSibling.innerText}`;
+                    const passwordField = document.createElement('input');
+                    passwordField.type = 'hidden';
+                    passwordField.name = 'password';
+                    passwordField.value = passwordInput.value;
+                    form.appendChild(passwordField);
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    passwordInput.style.display = 'none';
+                }
+            }
+        }
+    </script>
 </body>
 </html>
