@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Compare-It</title>
     <link rel="stylesheet" href="./style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Matemasie&display=swap" rel="stylesheet">
+
     <script>
-        // Display alert message if `message` query parameter exists
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const message = urlParams.get('message');
@@ -16,21 +18,20 @@
             }
         };
     </script>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap"> <!-- Fancy Font -->
+
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* Allow stacking of banner and main content */
+            flex-direction: column;
             height: 100vh;
         }
 
         main {
-            flex: 1; /* Allow main to take the remaining space */
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -45,28 +46,28 @@
             width: 300px;
         }
 
-        /* Bounce animation */
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0); /* Start and end at original position */
-            }
-            50% {
-                transform: translateY(-10px); /* Move up 10px at the middle of the animation */
-            }
-        }
-
         h1 {
             color: #333;
-            font-family: 'Playfair Display', serif; /* Apply Fancy Font */
-            font-size: 52px;
+            font-family: "Matemasie", sans-serif;
+            color: rgba(255, 166, 0, 0.822);
+            font-size: 45px;
             margin-top: 5px;
             margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Add text shadow */
-            animation: bounce 5s infinite; /* Apply bounce animation */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounce 5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         a.button {
-            display: block; /* Make buttons block elements to stack them */
+            display: block;
             background: #007bff;
             color: white;
             padding: 10px 20px;
@@ -82,30 +83,27 @@
 
         p {
             color: #666;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
 
-        /* Modal styles */
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .modal-content {
             background-color: white;
-            margin: 15% auto; /* 15% from the top and centered */
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
-            max-width: 600px; /* Max width of the modal */
+            max-width: 600px;
             border-radius: 10px;
         }
 
@@ -114,35 +112,31 @@
             float: right;
             font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
         }
 
         .close:hover,
         .close:focus {
             color: black;
             text-decoration: none;
-            cursor: pointer;
         }
     </style>
 </head>
+
 <body>
 
     <main>
         <div>
             <h1><b>Compare-It</b></h1>
-            <p class="description">
-                - Which is better -
-            </p>
-            <a class="button" href="categories">Compare</a>
             <a class="button" href="form">Create New Category</a>
-            <br><br>
+            <a class="button" href="categories">View Categories</a>
             <p><a href="#" id="aboutBtn">About</a></p>
-            <p>DB powered by: <a href="https://turso.tech/">Turso</a></p>
-            <p>Server hosted by: <a href="https://render.com/">Render</a></p>
-            <p>App created by: <a href="https://jbratvold.github.io/">Josh</a></p>
+            <p>DB powered by: <a href="https://turso.tech/" target="_blank" rel="noopener">Turso</a></p>
+            <p>Server hosted by: <a href="https://render.com/" target="_blank" rel="noopener">Render</a></p>
+            <p>App created by: <a href="https://jbratvold.github.io/" target="_blank" rel="noopener">Josh</a></p>
         </div>
     </main>
 
-    <!-- The Modal -->
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -152,26 +146,18 @@
     </div>
 
     <script>
-        // Get modal element
         const modal = document.getElementById("aboutModal");
-
-        // Get button that opens the modal
         const btn = document.getElementById("aboutBtn");
-
-        // Get the <span> element that closes the modal
         const span = document.getElementsByClassName("close")[0];
 
-        // When the user clicks the button, open the modal
         btn.onclick = function() {
             modal.style.display = "block";
         };
 
-        // When the user clicks on <span> (x), close the modal
         span.onclick = function() {
             modal.style.display = "none";
         };
 
-        // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
             if (event.target === modal) {
                 modal.style.display = "none";
@@ -179,4 +165,5 @@
         };
     </script>
 </body>
+
 </html>
