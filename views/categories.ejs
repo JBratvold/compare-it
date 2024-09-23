@@ -114,7 +114,10 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>
                         <button class="reset-button" onclick="toggleResetForm(this)">Reset</button>
-                        <button class="play-button" onclick="location.href='/categories/<%= table.value %>'">Play</button>
+                        <!-- <button class="play-button" onclick="location.href='/categories/<%= table.value %>'">Play</button> -->
+                        <button class="play-button" onclick="location.href='/play/<%= table.value %>'">Play</button>
+
+
                     </div>
                 </li>
             <% } %>

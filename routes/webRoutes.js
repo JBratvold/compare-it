@@ -35,6 +35,8 @@ router.post('/reset/:category', formController.resetCategory);
 // Add this route to check if the table exists
 router.get('/check-table-exists', dbController.checkTableExists);
 
+router.get('/play/:tableName', dbController.getPlayData); // New play route
+
 
 // Catch-all 404 route
 router.use((req, res) => {

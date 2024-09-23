@@ -90,3 +90,30 @@ exports.checkTableExists = async (req, res) => {
         res.status(500).send('An error occurred while checking table existence.');
     }
 };
+
+
+// dbController.js
+exports.getPlayData = async (req, res) => {
+    try {
+        const tableName = req.params.tableName;
+        const db_url = process.env.DB_URL;
+        const db_auth_token = process.env.DB_AUTH_TOKEN;
+
+        // Query to get all columns (excluding id, Prompt, Creator) for the comparison
+        const getColumnsQuery = `PRAGMA table_info("${tableName}");`;
+        const columnsResponse = await executeSQLQuery(db_url, db_auth_token, getColumnsQuery);
+
+        // Filter to get item columns only
+        const columns = columnsResponse.results[0].response.result.rows
+            .filter(row => row[1].value !== 'id' && row[1].value !== 'Prompt' && row[1].value !== 'Creator')
+            .map(row => row[1].value);
+
+        // Pass the column data (items) to the play.ejs view
+        res.render('play', { tableName, columns });
+        console.log("Table Name:", tableName)
+        console.log("Table Columns:", columns)
+    } catch (err) {
+        console.error('Error fetching play data:', err);
+        res.status(500).send('An error occurred while loading the comparison page.');
+    }
+};
