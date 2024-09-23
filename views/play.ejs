@@ -4,18 +4,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Play Comparison</title>
-    <link rel="stylesheet" href="/path/to/your/css/file.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        #comparison-container {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        #item-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #item-list li {
+            background: #e2e2e2;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>Comparison for <%= tableName %></h1>
+    <h2>Prompt</h2>
+    <p><%= prompt %></p>
+
     <div id="comparison-container">
         <p>Start your comparisons between the following items:</p>
-        <ul>
+        <ul id="item-list">
             <% columns.forEach(function(item) { %>
                 <li><%= item %></li>
             <% }) %>
         </ul>
     </div>
-    <button onclick="location.href='/categories'">Back to Categories</button>
+
+    <div id="comparison-container">
+        <h2 id="comparison-title"></h2>
+        <button id="item1-button"></button>
+        <button id="item2-button"></button>
+    </div>
+
+    <div>
+        <button onclick="location.href='/categories'">Back to Categories</button>
+        <button id="clear-cookies-button">Clear All Cookies (TESTING ONLY)</button>
+    </div>
+
+    <script>
+        let currentIndex = 0;
+
+        const items = [
+            <% columns.forEach(function(item, index) { %>
+                '<%= item %>'<%= index < columns.length - 1 ? ',' : '' %>
+            <% }) %>
+        ];
+
+        const comparisons = [];
+        for (let i = 0; i < items.length; i++) {
+            for (let j = i + 1; j < items.length; j++) {
+                comparisons.push([items[i], items[j]]);
+            }
+        }
+
+        function loadProgress() {
+            const encodedTableName = encodeURIComponent("<%= tableName %>");
+            const name = `currentIndex_${encodedTableName}=`;
+            const cookiesSplit = document.cookie.split(';');
+
+            cookiesSplit.forEach(element => {
+                const cookie = element.trim();
+                if (cookie.startsWith(name)) {
+                    const indexValue = cookie.split('=')[1];
+                    currentIndex = (!isNaN(indexValue) && indexValue < comparisons.length) ? parseInt(indexValue, 10) : 0;
+                }
+            });
+        }
+
+        function displayComparison() {
+            if (currentIndex < comparisons.length) {
+                const [item1, item2] = comparisons[currentIndex];
+                document.getElementById('comparison-title').innerText = `Comparing ${decodeHTMLEntities(item1)} and ${decodeHTMLEntities(item2)}`;
+                document.getElementById('item1-button').innerText = decodeHTMLEntities(item1);
+                document.getElementById('item2-button').innerText = decodeHTMLEntities(item2);
+            } else {
+                showCompletionPage();
+            }
+        }
+
+        function handleSelection(winner) {
+            incrementItemValue(winner);
+            const encodedTableName = encodeURIComponent("<%= tableName %>");
+            document.cookie = `currentIndex_${encodedTableName}=${currentIndex + 1}; expires=${getCookieExpirationDate(5)}; path=/`;
+            currentIndex++;
+            displayComparison();
+        }
+
+        function getCookieExpirationDate(months) {
+            const now = new Date();
+            now.setMonth(now.getMonth() + months);
+            return now.toUTCString();
+        }
+
+        function showCompletionPage() {
+            document.getElementById('comparison-container').innerHTML = '<h2>Thank you for completing the comparisons!</h2>';
+        }
+
+        function decodeHTMLEntities(text) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            return textarea.value;
+        }
+
+        function incrementItemValue(item) {
+            const parsedTableName = decodeHTMLEntities("<%= tableName %>");
+            const parsedItemName = decodeHTMLEntities(item);
+
+            fetch(`/increment-value`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tableName: parsedTableName, item: parsedItemName }),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // Optionally handle success
+            })
+            .catch(error => {
+                console.error('Error incrementing item value:', error);
+            });
+        }
+
+        function clearCookies() {
+            const cookies = document.cookie.split("; ");
+            cookies.forEach(cookie => {
+                const name = cookie.split("=")[0];
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+            });
+        }
+
+        loadProgress();
+        displayComparison();
+
+        document.getElementById('item1-button').addEventListener('click', () => handleSelection(comparisons[currentIndex][0]));
+        document.getElementById('item2-button').addEventListener('click', () => handleSelection(comparisons[currentIndex][1]));
+        document.getElementById('clear-cookies-button').addEventListener('click', clearCookies);
+    </script>
 </body>
 </html>

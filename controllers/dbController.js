@@ -99,21 +99,60 @@ exports.getPlayData = async (req, res) => {
         const db_url = process.env.DB_URL;
         const db_auth_token = process.env.DB_AUTH_TOKEN;
 
-        // Query to get all columns (excluding id, Prompt, Creator) for the comparison
-        const getColumnsQuery = `PRAGMA table_info("${tableName}");`;
-        const columnsResponse = await executeSQLQuery(db_url, db_auth_token, getColumnsQuery);
+        // Query to get the prompt and all columns (excluding id, Prompt, Creator)
+        const getPromptAndColumnsQuery = `SELECT "Prompt", * FROM "${tableName}";`;
+        const response = await executeSQLQuery(db_url, db_auth_token, getPromptAndColumnsQuery);
+        
+        // Log the response for debugging
+        const rows = response.results[0].response.result.rows;
+
+        // Fetch prompt from the first row, assuming it is in the first column
+        const prompt = rows.length > 0 && rows[0][0].value !== undefined ? rows[0][0].value : "No prompt available."; // Accessing the first column's value
 
         // Filter to get item columns only
-        const columns = columnsResponse.results[0].response.result.rows
-            .filter(row => row[1].value !== 'id' && row[1].value !== 'Prompt' && row[1].value !== 'Creator')
-            .map(row => row[1].value);
+        const columns = response.results[0].response.result.cols
+            .filter(col => col.name !== 'id' && col.name !== 'Prompt' && col.name !== 'Creator')
+            .map(col => col.name);
 
-        // Pass the column data (items) to the play.ejs view
-        res.render('play', { tableName, columns });
-        console.log("Table Name:", tableName)
-        console.log("Table Columns:", columns)
+        // Pass the prompt and column data (items) to the play.ejs view
+        res.render('play', { tableName, prompt, columns });
+ 
     } catch (err) {
         console.error('Error fetching play data:', err);
         res.status(500).send('An error occurred while loading the comparison page.');
     }
 };
+
+
+
+
+
+// Function to increment item value in the database
+exports.incrementItemValue = async (req, res) => {
+    const { tableName: encodedTableName, item } = req.body; // Get encoded tableName from req.body
+    const tableName = decodeURIComponent(encodedTableName); // Decode the table name
+    const db_url = process.env.DB_URL;
+    const db_auth_token = process.env.DB_AUTH_TOKEN;
+
+    try {
+        // Generate the UPDATE query
+        const updateQuery = `UPDATE "${tableName}" SET "${item}" = "${item}" + 1;`;
+        
+        // Execute the update query
+        const response = await executeSQLQuery(db_url, db_auth_token, updateQuery);
+
+        // Check for errors in the response
+        if (response.results && response.results.some(result => result.type === 'error')) {
+            throw new Error('Error updating item value: ' + JSON.stringify(response.results));
+        }
+
+        // Send a success response
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error incrementing item value:', err);
+        res.status(500).send('An error occurred while incrementing the item value.');
+    }
+};
+
+
+
