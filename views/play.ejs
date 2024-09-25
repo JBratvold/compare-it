@@ -112,32 +112,53 @@
 
     <div id="button-container" style="text-align: center;">
         <button class="back-next-button" onclick="location.href='/categories'">Back to Categories</button>
-        <button class="back-next-button" id="clear-cookies-button">Restart Progress (Clear Cookies)</button>
+        <button class="back-next-button" id="clear-cookies-button" onclick="clearCookies()">Restart Progress (Clear Cookies)</button>
     </div>
 
     <script>
         let currentIndex = 0;
+        const seed = 12345; // Fixed seed for consistent shuffling
+        let typedInput = ''; // Variable to track user input
+    
+        // A simple deterministic random number generator
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+    
+        // Shuffle function using the fixed seed
+        function deterministicShuffle(array) {
+            const shuffledArray = array.slice();
+            for (let i = shuffledArray.length - 1; i > 0; i--) {
+                const j = Math.floor(seededRandom(seed + i) * (i + 1));
+                [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+            }
+            return shuffledArray;
+        }
+    
         const items = [
             <% columns.forEach(function(item, index) { %>
                 '<%= item %>'<%= index < columns.length - 1 ? ',' : '' %>
             <% }) %>
         ];
-
+    
         const comparisons = [];
         for (let i = 0; i < items.length; i++) {
             for (let j = i + 1; j < items.length; j++) {
                 comparisons.push([items[i], items[j]]);
             }
         }
-
-        const totalComparisons = comparisons.length; // Total number of comparisons
-
+    
+        // Shuffle comparisons with the deterministic shuffle
+        const shuffledComparisons = deterministicShuffle(comparisons);
+        const totalComparisons = shuffledComparisons.length; // Total number of comparisons
+    
         // Load progress from cookies
         function loadProgress() {
             const encodedTableName = encodeURIComponent("<%= tableName %>");
-            const name = `currentIndex_${encodedTableName}=`;
+            const name = `currentIndex_${encodedTableName}=`; 
             const cookiesSplit = document.cookie.split(';');
-
+    
             cookiesSplit.forEach(element => {
                 const cookie = element.trim();
                 if (cookie.startsWith(name)) {
@@ -146,32 +167,32 @@
                 }
             });
         }
-
+    
         // Display the current comparison
         function displayComparison() {
             updateProgress();
             if (currentIndex < totalComparisons) {
-                const [item1, item2] = comparisons[currentIndex];
+                const [item1, item2] = shuffledComparisons[currentIndex]; // Use shuffled comparisons
                 document.getElementById('item1-button').innerText = decodeHTMLEntities(item1);
                 document.getElementById('item2-button').innerText = decodeHTMLEntities(item2);
             } else {
                 showCompletionPage();
             }
         }
-
+    
         // Update the progress bar and status
         function updateProgress() {
             const progress = (currentIndex / totalComparisons) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
-
+    
             // Change progress bar color to green when completed
             if (currentIndex === totalComparisons) {
                 document.getElementById('progress-bar').style.backgroundColor = '#28a745'; // Change to green
             }
-
+    
             document.getElementById('progress-status').innerText = `${currentIndex} / ${totalComparisons}`;
         }
-
+    
         // Handle user selection
         function handleSelection(winner) {
             incrementItemValue(winner);
@@ -180,13 +201,13 @@
             currentIndex++;
             displayComparison();
         }
-
+    
         function getCookieExpirationDate(months) {
             const now = new Date();
             now.setMonth(now.getMonth() + months);
             return now.toUTCString();
         }
-
+    
         function showCompletionPage() {
             document.getElementById('comparison-container').innerHTML = `
                 <h2>You have compared every item!</h2>
@@ -195,17 +216,17 @@
             document.getElementById('progress-status').innerText = "Completed";
             document.getElementById('progress-bar').style.backgroundColor = '#28a745'; // Change to green
         }
-
+    
         function decodeHTMLEntities(text) {
             const textarea = document.createElement('textarea');
             textarea.innerHTML = text;
             return textarea.value;
         }
-
+    
         function incrementItemValue(item) {
             const parsedTableName = decodeHTMLEntities("<%= tableName %>");
             const parsedItemName = decodeHTMLEntities(item);
-
+    
             fetch(`/increment-value`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -219,7 +240,7 @@
                 console.error('Error incrementing item value:', error);
             });
         }
-
+    
         function clearCookies() {
             const cookies = document.cookie.split("; ");
             cookies.forEach(cookie => {
@@ -228,29 +249,30 @@
             });
             location.reload(); // Refresh the page after clearing cookies
         }
-
-        // Show the clear cookies button when "josh" is typed
-        let inputBuffer = '';
-        document.addEventListener('keydown', (event) => {
-            inputBuffer += event.key;
-
-            // Check if the last characters match "josh"
-            if (inputBuffer.slice(-4) === 'josh') {
-                document.getElementById('clear-cookies-button').style.display = 'block';
+    
+        document.getElementById('item1-button').addEventListener('click', () => handleSelection(shuffledComparisons[currentIndex][0]));
+        document.getElementById('item2-button').addEventListener('click', () => handleSelection(shuffledComparisons[currentIndex][1]));
+    
+        // Listen for keypresses to detect "josh"
+        window.addEventListener('keypress', (event) => {
+            typedInput += event.key; // Append the typed character
+    
+            // Check if the typed input matches "josh"
+            if (typedInput.toLowerCase() === 'josh') {
+                typedInput = ''; // Reset typed input
+                document.getElementById('clear-cookies-button').style.display = 'block'; // Show the clear cookies button
             }
-
-            // Reset the input buffer if it exceeds 4 characters
-            if (inputBuffer.length > 4) {
-                inputBuffer = inputBuffer.slice(1);
+    
+            // Remove the oldest character if the input exceeds 4 characters
+            if (typedInput.length > 4) {
+                typedInput = typedInput.substring(1);
             }
         });
-
+    
+        // Load progress and display the first comparison
         loadProgress();
         displayComparison();
-
-        document.getElementById('item1-button').addEventListener('click', () => handleSelection(comparisons[currentIndex][0]));
-        document.getElementById('item2-button').addEventListener('click', () => handleSelection(comparisons[currentIndex][1]));
-        document.getElementById('clear-cookies-button').addEventListener('click', clearCookies);
     </script>
+    
 </body>
 </html>
