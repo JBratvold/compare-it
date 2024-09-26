@@ -266,7 +266,6 @@
           uniqueItems.add(item);
         }
       });
-      console.log("HELLO");
       if (hasDuplicates) {
         console.log("DISABLED");
         warningDiv.style.display = 'block'; // Show warning
@@ -274,7 +273,6 @@
         nextButton.style.backgroundColor = '#ccc'; // Change button color to grey
         nextButton.style.cursor = 'not-allowed'; // Change cursor to indicate disabled state
       } else {
-        console.log("ENABLED");
         warningDiv.style.display = 'none'; // Hide warning
         nextButton.disabled = false; // Enable Next button
         nextButton.style.backgroundColor = '#007bff'; // Reset button color
@@ -288,11 +286,27 @@
         const warningDiv = document.getElementById('table-exists-warning');
         const nextButton = document.getElementById('nextButton'); // Reference to the Next button
 
+        const startsWithNumber = /^\d/; // Regular expression to check if the string starts with a number
+
         if (category) {
+            // Check if the category starts with a number
+            if (startsWithNumber.test(category)) {
+                warningDiv.innerText = "Category title cannot start with a number."; // Warning message
+                warningDiv.style.display = 'block'; // Show warning
+                nextButton.disabled = true; // Disable Next button
+                nextButton.style.backgroundColor = '#ccc'; // Change button color to grey
+                nextButton.style.cursor = 'not-allowed'; // Change cursor to indicate disabled state
+                return; // Exit function to prevent further checks
+            } else {
+                warningDiv.style.display = 'none'; // Hide warning
+            }
+
+            // Check if the table exists
             const response = await fetch(`/check-table-exists?category=${encodeURIComponent(category)}`);
             const exists = await response.json();
 
             if (exists) {
+                warningDiv.innerText = "Category title already exists. Please choose a different name."; // Existing table warning
                 warningDiv.style.display = 'block'; // Show warning
                 nextButton.disabled = true; // Disable Next button
                 nextButton.style.backgroundColor = '#ccc'; // Change button color to grey
@@ -311,6 +325,7 @@
         }
     }
 
+
     window.onload = () => {
       showStep(currentStep); // Show the first step on page load
     };
@@ -319,7 +334,7 @@
 <body>
 
     <main>
-        <h1>Pairwise Comparison Set-Up</h1>
+        <h1>Category Set-Up</h1>
         <div class="progress">
             <div class="progress-bar"></div>
         </div>
